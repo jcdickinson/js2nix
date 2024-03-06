@@ -118,6 +118,11 @@ in
     assert builtins.typeOf value == "bool"; 
     pkg.override { doCheck = value; };
 
+  fn.doCheckInstall = { pkg, value, ... }: 
+    # Accept only boolean as an input.
+    assert builtins.typeOf value == "bool"; 
+    pkg.override { doCheckInstall = value; };
+
   # Override the src field.
   #
   fn.src = { pkg, value, package-json, ... }:

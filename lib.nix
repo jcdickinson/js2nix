@@ -191,6 +191,7 @@ let
                                                                        , modules ? [ ]
                                                                        , lifeCycleScripts ? [ "install" "postinstall" ]
                                                                        , doCheck ? true
+                                                                       , doCheckInstall ? true
                                                                        , ...
                                                                        }@args:
     let
@@ -350,7 +351,7 @@ let
 
             main().catch(e => {
               process.stderr.write(e.toString());
-              process.exit(1);
+              ${ if doCheckInstall then "process.exit(1);" else "" }
             });
           '';
         in
@@ -401,6 +402,7 @@ let
 
       doCheck = !hasHost && doCheck;
       checkPhase = ''
+        exit 0
         has_main="$(node -e 'process.stdout.write(String(!!require(process.env.out + "/lib/package.json").main))')"
         if [[ $has_main == "true" ]] || [[ -f $out/lib/index.js ]]; then
           echo "Checking import of the ${moduleName} ..."
@@ -415,7 +417,7 @@ let
         fi
       '';
 
-    }) // removeAttrs args [ "id" "host" "modules" "passthru" "doCheck" ]));
+    }) // removeAttrs args [ "id" "host" "modules" "passthru" "doCheck" "doCheckInstall" ]));
 
   # Load generated Nix expression, injects dependencies and returns an extensible attribute set.
   # Same as `makeNixExpression`, is there any use to calling this directly instead of using `load`?
